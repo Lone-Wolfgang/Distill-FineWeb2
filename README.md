@@ -10,8 +10,8 @@ To address this, FineWeb leadership has requested a list of high-quality URLs an
 
 I face some constraints in this task. Living abroad, I’m working with limited compute resources: a 500 GB internal hard drive, a 2 TB external drive, and 16 GB of RAM. The Japanese segment of the dataset is quite large, totaling about 500 GB and divided into 146 shards.
 
-In my notebook, I’ll demonstrate how I extracted a sample of potentially high-quality IDs. To do this, I analyzed the websites contributing to the FineWeb corpus. The data has been preprocessed, allowing me to quickly query the number of pages and URLs contributed by each site. I’ve focused on the largest contributors, identifying domains with some educational content and scraping promising links. Using this list of links, I query the preprocessed data and compile the corresponding IDs if the links are present.
+As now, this repsository has two notebooks:
+- **preprocess.ipynb**: documents the steps for grouping the FineWeb corpus by domain, which makes it easier to browse and analyze its contents.
+- **webscraping.ipynb**: outlines a couple of stratgies for compiling promising links by webscraping and exctracing the appropriate IDs fomr the FineWebCorpus.
 
-The notebook explains how I preprocessed the data, and how to scrape using BeautifulSoup.
-
-In the folder labeled "IDs," you’ll find IDs from the FineWeb corpus that I’ve identified as potentially high quality. Currently, these IDs are from a single website, but I am working on adding more.
+In the folder labeled "IDs," you’ll find IDs from the FineWeb corpus that I’ve identified as potentially high quality. Currently, these IDs are from a two websites, but I am working on adding more.
