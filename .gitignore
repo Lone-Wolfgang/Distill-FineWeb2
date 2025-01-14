@@ -1,2 +1,6 @@
 /preprocess/
-/preprocessed.parquet
+/intermediate/stripped/jpn_Jpan/
+/intermediate/grouped/jpn_Jpan/
+/preprocessed/pxm_Latn.parquet
+/FineWeb/
+/modules/
