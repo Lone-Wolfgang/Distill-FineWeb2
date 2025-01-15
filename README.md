@@ -1,4 +1,4 @@
-# Distill-FineWeb2
+# Distill FineWeb2
 
 Hello, everyone,
 
@@ -10,7 +10,8 @@ To address this, FineWeb leadership has requested a list of high-quality URLs an
 
 I face some constraints in this task. Living abroad, I’m working with limited compute resources: a 500 GB internal hard drive, a 2 TB external drive, and 16 GB of RAM. The Japanese segment of the dataset is quite large, totaling about 500 GB and divided into 146 shards.
 
-As now, this repsository has two notebooks:
+As of now, this repsository has two notebooks:
+
 - **preprocess.ipynb**: documents the steps for grouping the FineWeb corpus by domain, which makes it easier to browse and analyze its contents.
 - **webscraping.ipynb**: outlines a couple of stratgies for compiling promising links by webscraping and exctracing the appropriate IDs fomr the FineWebCorpus.
 
