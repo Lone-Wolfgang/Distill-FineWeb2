@@ -1,6 +1,7 @@
-/preprocess/
-/intermediate/stripped/jpn_Jpan/
-/intermediate/grouped/jpn_Jpan/
-/preprocessed/pxm_Latn.parquet
-/FineWeb/
-/modules/
+/annotated/
+/intermediate/
+FineWeb/
+/cli/
+.gitignore
+notebook.ipynb
+collect_ids.ipynb

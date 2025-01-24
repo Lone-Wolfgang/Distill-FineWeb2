@@ -1,0 +1,215 @@
+
+{
+    "bioresearch-troubleshooting":
+    {   
+        "homepage": "https://bioresearch-troubleshooting.info/",
+        "domain": "science",
+        "subdomain": "biology",
+        "quality": 3,
+        "notes": "PhD accredited researcher explains general experimental methodology. Focuses on genetic analysis."
+    },
+    "mathematica":
+    {
+        "homepage": "https://mathematica.site",
+        "domain": "math",
+        "subdomain": "history",
+        "quality": 4,
+        "notes": "WebZine exploring historical origins of mathematical theory. Topics include Egyptian math, Galileo, Archimedes, Calendar, and Euclid. Examples are provided. Although there are images, most content is HTML based."
+    },
+    "oshiete":
+    {
+        "homepage": "https://oshiete.goo.ne.jp/",
+        "domain": "general",
+        "subdomain": "QA forum",
+        "quality": 2,
+        "notes": "General QA forum. This links were extracted from the 'Expert' section. Topics cover general life, such as relationships, family matters, finanaces. Some articles are very good, others are advertisements."
+    },
+    "jpnculture":
+    {
+        "homepage": "https://jpnculture.net/",
+        "domain": "culture",
+        "subdomain": "Japanese Culture",
+        "quality": 4,
+        "notes": "Light explanation of different aspects of Japanese culture. Language, proverbs, holidays, regional information, arts and crafts, religion."
+    },
+    "kamiconsal":
+    {
+        "homepage": "https://kamiconsal.jp/",
+        "domain": "commodities",
+        "subdomain": "paper",
+        "quality": 3,
+        "notes": "A blog written by an engineer at a paper manufacturer. There's a lot of subcategories, such as different types of papers, use cases, history, recycling. Topics are explained without tremendous depth, and ad links are frequent. Suspected SEO blog."
+    },
+    "ace-compliance":
+    {
+        "homepage": "https://www.ace-compliance.com/blog/",
+        "domain": "legal",
+        "subdomain": "waste management",
+        "quality": 3,
+        "notes": "A waste managment expert produced a series of articles that combs through the regulatory standards for Japanese waste managment and explains in common sense terms."
+    },
+    "phys-world":
+    {
+        "homepage": "https://phys-world.com/",
+        "domain": "science",
+        "subdomain": "physics",
+        "quality": 5,
+        "notes": "Detailed expantion of a few general concepts of physics. Targeted at high school students."
+    },
+    "kaze-yashiro":
+    {
+        "homepage": "https://kaze-yashiro.com/",
+        "domain": "religion",
+        "subdomain": "Shinto",
+        "quality": 3,
+        "notes": "Overview of big picture concepts of Shinto. Also includes full text of Shinto documents with modern translations."
+    },
+    "control-theory" :{
+        "homepage": "https://blog.control-theory.com/",
+        "domain": "science",
+        "subdomain": "electrical engineering",
+        "quality": 4,
+        "notes": "Graduate level blog explaining fundamental concepts of control theory. This is high-level information, and the main limitation is that it is difficut to understand. Nevertheless, their explanations are thorough, and many HTML examples are provided. The language seems accessible enough to be useful."
+    },
+    "interuniversitylearning" :{
+        "homepage": "https://interuniversitylearning.com/",
+        "domain": "programming",
+        "subdomain": "Python, R",
+        "quality": 3,
+        "notes": "Very basic methods in Python and R, targetted at beginners. Complete with copy-paste code boxes."
+    },
+    "statisticsschool": {
+        "homepage": "https://statisticsschool.com/",
+        "domain": "science",
+        "subdomain": "statistics",
+        "quality": 5,
+        "notes": "Common sense explanations of mid to high level topics. Python code boxes. Examples written in TEX. Specefic examples for ML, social sciences, biology."
+    },
+    "sinriura": {
+        "homepage": "https://sinriura.com/",
+        "domain": "psychology",
+        "subdomain": "clinical",
+        "quality": 3,
+        "notes": "Guide to clinical prognoses. Focuses on coping strategies for those close to ones with psychological disorders."
+    },
+    "kodaishikoushou": {
+        "homepage": "https://kodaishikoushou.com/",
+        "domain": "history",
+        "subdomain": "archaeology",
+        "quality": 4,
+        "notes": "Discusses significant historical sites in Japan. Provides historical and mythological context in detail."
+    },
+    "jijineko": {
+        "homepage": "https://jijineko.blog/",
+        "domain": "science",
+        "subdomain": "pharmacology",
+        "quality": 4,
+        "notes": "Managing pharmacist that writes on a variety of topics. Disease treatment, drug types, drug interactions. Very detailed, but relies a lot on images."
+    },
+    "kmrysyk": {
+        "homepage": "https://www.kmrysyk.com/",
+        "domain": "legal",
+        "subdomain": "dispute QA",
+        "quality": 4,
+        "notes": "Attorney writes about everyday legal questions. Entries describe common problems, identifies relevent legal code and precedence, provides commentary."
+    },
+    "astronomy-orino": {
+        "homepage": "http://www.astronomy.orino.net/",
+        "domain": "science",
+        "subdomain": "astronomy",
+        "quality": 3,
+        "notes": "Mostly trivia style information about celestial bodies. Lacks depth, but covers a lot of topics in the solar system. Some advice for astronomy beginners, like telescope maintenence."
+    },
+    "electricityprofessional": {
+        "homepage": "https://electricityprofessional.com/",
+        "domain": "science",
+        "subdomain": "electrical engineering",
+        "quality": 3,
+        "notes": "Basic concepts of electrical engineering, and advice for those pursing a related career. Some detailed explanations, but also a lot of image content."
+    },
+    "neoneeet": {
+        "homepage": "https://neoneeet.com/",
+        "domain": "science",
+        "subdomain": "chemical engineering",
+        "quality": 4,
+        "notes": "Written by chemical engineering plant manager. Covers a lot of topics a about chemical processes and plant design. Most articles lack depth, but the language is simple and there are not too many images."
+    },
+    "shinrin-ringyou": {
+        "homepage": "http://www.shinrin-ringyou.com/",
+        "domain": "science",
+        "subdomain": "forestry",
+        "quality": 5,
+        "notes": "Educational blog targetted suitable for highschool+. Covers ecology, husbandry, economics, and conservation. Although their are images, the text is stand-alone."
+    },
+    "stat-naruhodo": {
+        "homepage": "https://www.stat.go.jp/naruhodo/",
+        "domain": "math",
+        "subdomain": "statistics",
+        "quality": 3,
+        "notes": "Statistics education for elementary and highschool students. Only a few articles with stand-alone text were selected. Some pages are explanations of statisical terms, others are case studies."
+    },
+    "qiita": {
+        "homepage": "https://qiita.com/",
+        "domain": "programming",
+        "subdomain": "QA forum",
+        "quality": 3,
+        "notes": "Very popular QA form for developers. Articles marked as 'beginner' and ranked highly by number of 'Likes' were selected."
+    },
+    "engineer-education": {
+        "homepage": "https://engineer-education.com/",
+        "domain": "engineering",
+        "subdomain": "general",
+        "quality": 3,
+        "notes": "SEO blog for promoting text books, e-learning materials. Broadly covers mechanical, electrical, chemical, and biological engineering. Covers a lot of topics, but lacks depth."
+    },
+    "medical-educator": {
+        "homepage":  "https://medical-educator.hatenablog.com/",
+        "domain": "education",
+        "subdomain": "methodology",
+        "quality": 3,
+        "notes": "Summarizes research articles that explore methodoliges for educating medical students. Each post summarizes the background, research questions, methods, results, and implications."
+    },
+    "rekishijin":  {
+        "homepage":  "https://www.rekishijin.com/",
+        "domain": "history",
+        "subdomain": "Japanese & World History",
+        "quality": 4,
+        "notes": "Explains specefic historical events in detail with common language. Japanese history is the focus. Articles cover ancient and contemporary topics. This website includes some sections for entertainment, but most were filtered. The only real limitation is lack of primary text."
+    },
+    "rekishiwales":  {
+        "homepage":  "https://www.rekishiwales.com/",
+        "domain": "history",
+        "subdomain": "Welsh, English, and British History",
+        "quality": 4,
+        "notes": "Welsh historian writes articles about medieval history of the British Isles. Prominent topics includes historical figures, legends, events. Some articles are for entertainment."
+    },
+    "math-fun":  {
+        "homepage":  "https://math-fun.net/",
+        "domain": "math",
+        "subdomain": "undergraduate",
+        "quality": 3,
+        "notes": "Detailed explanation of various undergraduate level math concepts. Most examples use LaTEX. Some articles are less valuable, such as study habits."
+    },
+    "zenn-dev":  {
+        "homepage":  "https://zenn.dev/",
+        "domain": "programming",
+        "subdomain": "developer's forum",
+        "quality": 4,
+        "notes": "User authored articles about all topics relating to development. Articles were ranked by likes, and the top articles from each category were selected."
+    },
+    "agri-mynavi":  {
+        "homepage":  "https://agri.mynavi.jp",
+        "domain": "agriculture",
+        "subdomain": "farming techniques",
+        "quality": 3,
+        "notes": "Selected from a website intended to help farmers learn new techniques, develop their business, and use new technologies."
+    },
+    "kaizencpa": {
+        "homepage":  "https://kaizencpa.blog.jp/",
+        "domain": "legal",
+        "subdomain": "international investment",
+        "quality": 3,
+        "notes": "CPA writes about legal and tax considerations when making foreign investments. Each article focuses on a selection of legal language and explains it in a more simple way."
+    }
+
+}
