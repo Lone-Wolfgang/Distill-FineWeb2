@@ -3,29 +3,47 @@ import os
 from pathlib import Path
 import polars as pl
 from tqdm.auto import tqdm
-from typing import Literal
+from typing import Union, List
 
-def filter_fineweb(
-    data: str,
-    filter_fn: object,
+def filter_fn(
+    path: str,
+    filter_column: str,
+    target: str,
+    retrieve_columns: Union[None, List[str]] = None,
 )-> pl.DataFrame:
     """
-    Flexible function that will iterate through files, filter data, and compile into a single DataFrame.
+    Flexible helper function to be used in conjunction with collect_ids.filter_fineweb.
+
+    Given a path to a FineWeb DataFrame, filters by the given parameters.
 
     Args:
-        data(str): Either an explicit path to a parquet DataFrame or a directory where parquet files are saved.
+        path(str): Path to a FineWeb DataFrame.
+        filter_column(str): Column which is to be filtered.
+        target(str): Filters rows where the filter_column contains the target string.
+        retrieve_columns(List[str]): Only loads retrieve_columns. If None, retrieves all columns.
+    """
+    possible_columns = pl.read_parquet_schema(path)
+    if not filter_column in possible_columns:
+        raise ValueError(f'{filter_column} not found. Please select from {possible_columns}')
+    if retrieve_columns and not all(c in possible_columns for c in retrieve_columns):
+        raise ValueError(f'Retrieve columns do not align with data. Please select from {possible_columns}')
+    df = pl.read_parquet(path, columns=retrieve_columns)
+    return df.filter(df[filter_column].str.contains(target))
+
+def filter_fineweb(
+    data_dir: str,
+    filter_fn: object
+)-> pl.DataFrame:
+    """
+    Iterates through a list of FineWeb files, applies a filter function, and combines results into a single DataFrame.
+
+    Args:
+        data(str):Directory where FineWeb parquet files are saved.
         filter_fn(object): Function that takes a filepath, loads it, filters it, and returns a pl.DataFrame.
     """
     output = pl.DataFrame()
 
-    if os.path.isdir(data):
-        paths = [Path(data, file) for file in os.listdir(data) if file.endswith('.parquet')]
-        if len(paths) == 0:
-            raise ValueError(f'No parquet files found in {data}. Please either provide an explicit path to a parquet DataFrame or a path to a directory where parquet files are saved.')
-    elif data.endwith('.parquet'):
-        paths = [data]
-    else:
-        raise ValueError
+    paths = [Path(data_dir, file) for file in os.listdir(data_dir) if file.endswith('.parquet')]
     for path in tqdm(paths, desc='Filtering FineWeb'):
         filtered = filter_fn(path)
         if not isinstance(filtered, pl.DataFrame):

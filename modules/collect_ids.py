@@ -1,4 +1,5 @@
 import bs4
+from collections import Counter
 from datasets import Dataset
 import json
 import os
@@ -82,7 +83,26 @@ def scrape_links(
     
     # Filter links with the provided regex
     return filter_links(links=links, regex=regex)
-             
+
+def count_path_branches(links: List[str])->Counter:
+    """
+    Useful for developing regex to target links.
+
+    Takes a list of links and counts URL branches.
+    """
+    paths = [urlparse(link).path for link in links]
+    branches = []
+    
+    # Split each path into hierarchical components
+    for path in paths:
+        parts = path.split('/')
+        for i in range(1, len(parts) + 1):
+            branches.append('/'.join(parts[:i]))
+    
+    # Count the frequency of each branch
+    branch_freq = Counter([b for b in branches if b])
+    return branch_freq
+
 def save_list_to_txt(
         _list: List[str],
         output_path: str

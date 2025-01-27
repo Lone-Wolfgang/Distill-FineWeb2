@@ -9,7 +9,7 @@ import random
 from shutil import rmtree
 from tld import get_tld
 from tqdm.auto import tqdm
-from typing import List
+from typing import List, Dict
 from urllib.parse import urlparse
 
 def get_fineweb_paths(language = "")-> List[str]:
@@ -30,21 +30,19 @@ def get_fineweb_languages()-> List[str]:
     paths = get_fineweb_paths()
     return list(set([path.split('/')[1] for path in paths]))
 
-def get_io_paths(language, local_dir = ""):
+def get_io_paths(language, output_dir: str='FineWeb')-> Dict[str, Path]:
     """Helper function for building directory paths to save raw, intermediate, and preprocessed data."""
 
     dirs = {
-        'stripped': Path('intermediate', 'stripped', language),
-        'grouped': Path('intermediate', 'grouped', language),
-        'preprocessed': Path('preprocessed', f'{language}.parquet')
+        'stripped': Path(output_dir, 'intermediate', language, 'stripped'),
+        'grouped': Path(output_dir, 'intermediate', language, 'grouped'),
+        'preprocessed': Path(output_dir, 'preprocessed', f'{language}.parquet')
     }
-    if local_dir:
-        dirs.update({'raw': Path(local_dir, 'data', language, 'train')})
     return dirs
 
 def download_fineweb_data(
     language: str,
-    local_dir: str = 'FineWeb',
+    local_dir: str = 'FineWeb/raw',
     sample: int = int(),
     disable_progress_bar: bool = False,
     restart: bool = False
@@ -92,8 +90,9 @@ def download_fineweb_data(
         filename=path,
         local_dir=local_dir)
     
-    output_dir = get_io_paths(language, local_dir)['raw']
-    print(f'Download complete. Saved raw FineWeb data to {output_dir}')
+    raw_data_dir = Path(local_dir, os.path.dirname(paths[0]))
+    print(f'Download complete. Saved raw FineWeb data to {raw_data_dir}')
+    return raw_data_dir
 
 def get_domain(url: str)-> str:
     """Helper function that will take a URL and return the domain."""
@@ -111,7 +110,8 @@ def add_domain_column(df: pl.DataFrame)-> pl.DataFrame:
 
 def strip_and_add_domain_pipeline(
         language: str,
-        local_dir: str,
+        raw_data_dir: str,
+        output_dir: str = 'FineWeb',
         columns: List[str] = ['id', 'date', 'url'],
         disable_progress_bar: bool = False,
         print_statement: bool = True,
@@ -124,7 +124,8 @@ def strip_and_add_domain_pipeline(
 
     Args:
         language (str): Language which is being processed.
-        local_dir (str): The directory where FineWeb data is stored.
+        raw_data_dr (str): Explicit path to directory where raw data is stored.
+        output_dir (str): Direcotry to save intermediate and final outputs.
         columns (List[str]): The columns from FineWeb that are to be kept.
         disable_progress_bar (bool): Whether or not to disable the progresss bar.
         print_statement(bool): Whether to issue a print statment when complete.
@@ -132,30 +133,29 @@ def strip_and_add_domain_pipeline(
     """
 
     #Build your input/output paths
-    io_paths = get_io_paths(language, local_dir=local_dir)
-    input_dir, output_dir = io_paths['raw'], io_paths['stripped']
+    io_paths = get_io_paths(language, output_dir)
 
     #Checks if FineWeb data has been stripped with domain column added.
-    if not os.path.exists(input_dir):
-        raise FileNotFoundError(f'{input_dir} not found. Use download_fineweb_data to get language data.')
-    elif len(os.listdir(input_dir)) == 0:
-        raise FileNotFoundError(f'{input_dir} found, but it has no files. Use download_fineweb_data to get language data.')
+    if not os.path.exists(raw_data_dir):
+        raise FileNotFoundError(f'{raw_data_dir} not found. Use download_fineweb_data to get language data.')
+    elif len(os.listdir(raw_data_dir)) == 0:
+        raise FileNotFoundError(f'{raw_data_dir} found, but it has no files. Use download_fineweb_data to get language data.')
  
     #Builds a list a files, and makes a directory to save stripped data.
-    files = os.listdir(input_dir)
-    os.makedirs(output_dir, exist_ok=True)
+    files = [file for file in os.listdir(raw_data_dir) if file.endswith('.parquet')]
+    os.makedirs(io_paths['stripped'], exist_ok=True)
 
     #Ensures that 'url' is included, which is neccesary to proceed with grouping.
     if 'url' not in columns:
         raise ValueError ("To proceed with grouping, 'url' must be included in columns.")
     
     #Ensures that the input columns are contained in the FineWeb data.
-    possible_columns = pl.read_parquet_schema(Path(input_dir, os.listdir(input_dir)[0]))
+    possible_columns = pl.read_parquet_schema(Path(raw_data_dir, os.listdir(raw_data_dir)[0]))
     if not all(column in possible_columns for column in columns):
         raise ValueError (f"Column selection does not align with FineWeb data. Please select from these columns: {list(possible_columns.keys())}")
 
     for file in tqdm(files, desc= "Stripping dfs and adding domain column", disable=disable_progress_bar):
-        input_file, output_file = Path(input_dir, file), Path(output_dir, file)
+        input_file, output_file = Path(raw_data_dir, file), Path(io_paths["stripped"], file)
         
         if os.path.exists(output_file) and not restart:
             continue
@@ -165,12 +165,12 @@ def strip_and_add_domain_pipeline(
         df = add_domain_column(df)
         df.write_parquet(output_file)
     if print_statement:
-        total_files = len(os.listdir(output_dir))
-        print(f'Preprocessing complete. {total_files} processed. Saved files to {output_dir}')
-    return output_dir
+        total_files = len(os.listdir(io_paths['stripped']))
+        print(f'Stripping complete. {total_files} processed. Saved files to {io_paths["stripped"]}')
 
 def group_pipeline(
     language: str,
+    output_dir: str="FineWeb",
     disable_progress_bar: bool = False,
     print_statement: bool = True,
     restart: bool = False
@@ -182,26 +182,26 @@ def group_pipeline(
 
     Args:
         language (str): Language which is being processed.
+        output_dir (str): Direcotry to save intermediate and final outputs.
         disable_progress_bar (bool): Whether or not to disable the progress bar.
         print_statment (bool): Whether or not to issue a print statemnt on completion.
         restart (bool): If True, starts over and overwrites files that have already been processed.
 
     """
     #Build your input/output paths
-    io_paths = get_io_paths(language)
-    input_dir, output_dir = io_paths['stripped'], io_paths['grouped']
+    io_paths = get_io_paths(language, output_dir)
 
-    if not os.path.exists(input_dir):
-        raise FileNotFoundError(f'{input_dir} not found. Run strip_and_add_domain_pipeline before grouping.')
-    elif len(os.listdir(input_dir)) == 0:
-        raise FileNotFoundError(f'{input_dir} found, but it has no files. Run strip_and_add_domain_pipeline before grouping.')
+    if not os.path.exists(io_paths['stripped']):
+        raise FileNotFoundError(f'{io_paths["stripped"]} not found. Run strip_and_add_domain_pipeline before grouping.')
+    elif len(os.listdir(io_paths['stripped'])) == 0:
+        raise FileNotFoundError(f'{io_paths["stripped"]} found, but it has no files. Run strip_and_add_domain_pipeline before grouping.')
 
     #Builds a list a files, and makes a directory to save stripped data.
-    files = os.listdir(input_dir)
-    os.makedirs(output_dir, exist_ok=True)
+    files = [file for file in os.listdir(io_paths['stripped']) if file.endswith('.parquet')]
+    os.makedirs(io_paths['grouped'], exist_ok=True)
 
     for file in tqdm(files, desc= 'Grouping by domain', disable=disable_progress_bar):
-        input_file, output_file = Path(input_dir, file), Path(output_dir, file)
+        input_file, output_file = Path(io_paths['stripped'], file), Path(io_paths['grouped'], file)
         if os.path.exists(output_file) and not restart: 
                 continue
         
@@ -210,11 +210,12 @@ def group_pipeline(
         df = df.group_by('domain').count()
         df.write_parquet(output_file)
     if print_statement:
-        total_files = len(os.listdir(output_dir))
-        print(f'Preprocessing complete. {total_files} processed. Saved output to {output_dir}')
+        total_files = len(os.listdir(io_paths['grouped']))
+        print(f'Grouping complete. {total_files} processed. Saved output to {io_paths["grouped"]}')
 
 def combine_grouped_dfs(
     language: str,
+    output_dir: str='FineWeb',
     batch_size: int=10,
     disable_progress_bar: bool = False,
     print_statement: bool = True
@@ -224,6 +225,7 @@ def combine_grouped_dfs(
 
     Args:
         language (str): Language which is being processed.
+        output_dir (str): Direcotry to save intermediate and final outputs.
         batch_size (int): Number of DataFrames to process in each batch.
         diable_progress_bar (bool): Whether to disable the progress bar.
         print_statement (bool): Whether to issue a print statement on completion.
@@ -236,17 +238,16 @@ def combine_grouped_dfs(
     """
 
     #Build your input/output paths
-    io_paths = get_io_paths(language)
-    input_dir, output_file = io_paths['grouped'], io_paths['preprocessed']
+    io_paths = get_io_paths(language, output_dir)
 
     #Checks if FineWeb data has been stripped with domain column added.
-    if not os.path.exists(input_dir):
-        raise FileNotFoundError(f'{input_dir} not found. Group data using group_pipeline.')
-    elif len(os.listdir(input_dir)) == 0:
-        raise FileNotFoundError(f'{input_dir} found, but it has no files. Group data using group_pipeline.')
+    if not os.path.exists(io_paths['grouped']):
+        raise FileNotFoundError(f'{io_paths["grouped"]} not found. Group data using group_pipeline.')
+    elif len(os.listdir(io_paths['grouped'])) == 0:
+        raise FileNotFoundError(f'{io_paths["grouped"]} found, but it has no files. Group data using group_pipeline.')
     #Initialize the output and the filepaths
     output = None 
-    paths = [Path(input_dir, file) for file in os.listdir(input_dir)]
+    paths = [Path(io_paths['grouped'], file) for file in os.listdir(io_paths['grouped']) if file.endswith('.parquet')]
 
     #Compile the data in batches
     for i in tqdm(
@@ -274,24 +275,24 @@ def combine_grouped_dfs(
         )
     
     #Sort and save
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    os.makedirs(os.path.dirname(io_paths['preprocessed']), exist_ok=True)
     output = output.sort('count', descending=True)
-    output.write_parquet(output_file)
+    output.write_parquet(io_paths['preprocessed'])
 
     if print_statement:
-        print(f"Saved combined dataframe to {output_file}")
+        print(f"Saved combined dataframe to {io_paths['preprocessed']}")
         print(output.head(10))
 
 def download_and_preprocess_pipeline(
     language: str,
-    local_dir: str = "FineWeb",
+    local_dir: str = "FineWeb/raw",
+    output_dir: str = 'FineWeb',
     sample: int = int(),
     columns: List[str] = ['id', 'date', 'url'],
     batch_size: int=10,
     disable_progress_bar: bool = False,
     print_statement: bool = True,
-    restart: bool = False,
-    delete_intermediate_files: bool = False
+    restart: bool = False
     )-> pl.DataFrame:
     """
     Combines all previous pipelines.
@@ -299,8 +300,9 @@ def download_and_preprocess_pipeline(
     group it, and combine all files into a single DataFrame.
 
     Args:
+        language (str): Language which is being processed.
         local_dir (str): Directory where raw FineWeb data is stored.
-        stripped_data_dir (str): Directory to save stripped DataFrames with added "domain" column.
+        output_dir (str): Direcotry to save intermediate and final outputs.
         columns (List[str]): During stripping, identifies columns to keep.
         grouped_data_dir (str): Directory to save DataFrames grouped by domain.
         batch_size (int): When combining grouped data, the number of DataFrames to combine in each batch.
@@ -308,39 +310,41 @@ def download_and_preprocess_pipeline(
         disable_progress_bar (bool): Whether or not to disable the progress bar.
         print_statment (bool): Whether or not to issue a print statemnt on completion.
         restart (bool): If True, starts over and overwrites files that have already been processed.
-        delete_intermediate_files (bool): If True, will delete 'stripped' and 'grouped' files upon completion.
     
     Returns:
         Each step of preprocessing saves files to disk. 
         With the default settings, the structure will be:
 
-            root/
-            ├── FineWeb/data/{language}/train
-            │                            ├── 000_00000.parquet
-            │                            ├── 000_00001.parquet
-            │                            └── 000_00002.parquet
+        root/
+        └── FineWeb/
+            ├── raw/
+            │   └── data/
+            │       └── {language}/
+            │           └── train/
+            │               ├── 000_00000.parquet
+            │               ├── 000_00001.parquet
+            │               └── 000_00002.parquet
             ├── intermediate/
-            │   ├── stripped/{language}
-            │   │               ├── 000_00000.parquet
-            │   │               ├── 000_00001.parquet
-            │   │               └── 000_00002.parquet
-            │   ├── grouped/{language}
-            │   │               ├── 000_00000.parquet
-            │   │               ├── 000_00001.parquet
-            │   │               └── 000_00002.parquet
-            ├── preprocessed/
-                    └── {language}.parquet
+            │   └── {language}/
+            │       ├── stripped/
+            │       │   ├── 000_00000.parquet
+            │       │   ├── 000_00001.parquet
+            │       │   └── 000_00002.parquet
+            │       └── grouped/
+            │           ├── 000_00000.parquet
+            │           ├── 000_00001.parquet
+            │           └── 000_00002.parquet
+            └── preprocessed/
+                └── {language}.parquet
+
         
-        raw_data: DataFrames from FineWeb.
-        preprocess/stripped: DataFrames with unneccesary columns stripped and domain added.
-        preprocess/grouped: Invidual DataFrames grouped by domain.
-        preprocessed.parquet: Final output. All grouped DataFrames are combined and tld is added.
+        raw: Raw data from from FineWeb.
+        intermediate/{lang}/stripped: DataFrames with unneccesary columns stripped and domain added.
+        intermediate/{lang}/grouped: Invidual DataFrames grouped by domain.
+        preprocessed/{lang}.parquet: Final output. All grouped DataFrames are combined and tld is added.
     """
 
-    io_paths = get_io_paths(language, local_dir)
-    local_dir = io_paths['raw']
-
-    download_fineweb_data(
+    raw_data_dir = download_fineweb_data(
         language=language,
         local_dir=local_dir,
         sample=sample,
@@ -350,7 +354,8 @@ def download_and_preprocess_pipeline(
 
     strip_and_add_domain_pipeline(
         language=language,
-        local_dir=local_dir,
+        raw_data_dir=raw_data_dir,
+        output_dir=output_dir,
         columns=columns,
         disable_progress_bar=disable_progress_bar,
         print_statement=print_statement,
@@ -359,6 +364,7 @@ def download_and_preprocess_pipeline(
 
     group_pipeline(
         language=language,
+        output_dir=output_dir,
         disable_progress_bar=disable_progress_bar,
         print_statement=print_statement,
         restart=restart
@@ -366,14 +372,8 @@ def download_and_preprocess_pipeline(
 
     combine_grouped_dfs(
         language=language,
+        output_dir=output_dir,
         batch_size=batch_size,
         disable_progress_bar=disable_progress_bar,
         print_statement=print_statement
     )
-
-    if delete_intermediate_files:
-        print('Deleting intermediate files.')
-        rmtree(io_paths['stripped'])
-        rmtree(io_paths['grouped'])
-        if len(os.listdir('intermediate')) == 0:
-            os.rmdir('intermediate')

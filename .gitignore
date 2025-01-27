@@ -4,4 +4,3 @@ FineWeb/
 /cli/
 .gitignore
 notebook.ipynb
-collect_ids.ipynb
